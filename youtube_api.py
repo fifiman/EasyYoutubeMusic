@@ -1,4 +1,5 @@
 import logging
+import re
 import requests
 
 from utils import pretty_print_json
@@ -87,3 +88,48 @@ def get_playlist_items(playlist_id, api_key):
 			break
 
 	return results
+
+
+def get_channel_name(channel_id, api_key):
+
+	get_request = 'https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}'.format(channel_id, api_key)
+
+	r = requests.get(get_request)
+
+	if r.status_code == 200:
+		logging.info('GET request succeeded for fetching channel name.')
+
+		json_response = r.json()
+		# pretty_print_json(json_response)
+
+		return json_response['items'][0]['snippet']['title']		
+	else:
+		logging.info('GET request failed for fetching channel name. Status code: {}, response: {}'.format(r.status_code, r.text))
+		return None
+
+
+def parse_youtube_link(youtube_url):
+	"""
+	Determine whether link is for song, playlist, or channel.
+
+	Return url type along with the id for that type in form (type, type_id).
+	"""
+
+	# youtube_song_regex = r'.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*'
+	youtube_song_regex = r'https://www\.youtube\.com\/watch\?v=([^#\&\?]*).*'	
+	song_match = re.match(youtube_song_regex, youtube_url)
+
+	youtube_playlist_regex = r'https://www\.youtube\.com/playlist\?list=([^#\&\?]*).*'
+	playlist_match = re.match(youtube_playlist_regex, youtube_url)
+
+	youtube_channel_regex = r'https://www\.youtube\.com/channel\/([^#\&\?]*).*'
+	channel_match = re.match(youtube_channel_regex, youtube_url)
+
+	if song_match is not None:
+		return ('song', song_match.group(1))
+	elif playlist_match is not None:
+		return ('playlist', playlist_match.group(1))
+	elif channel_match is not None:
+		return ('channel', channel_match.group(1))
+	else:
+		return None
