@@ -1,55 +1,42 @@
-import errno
-import eyed3
-import logging
-import os
-import re
-import requests
-import subprocess
-from song_utils import clean_song_youtube_name, parse_youtube_title, tag_song
-from youtube_api import get_playlists, get_playlist_items
+
+import click
+from downloader import download_channel, download_song
+from youtube_api import parse_youtube_link
+
+__author__ = "Nenad Bauk"
+
+youtube_api_key = 'AIzaSyD7LTx-ECbBMewfjX6dzgnxDL7HxLTRZvY'
+my_channel_id = 'UCxEFrjBmbt2CLCFaAtGxaRA'
 
 
-channel_id = 'UCxEFrjBmbt2CLCFaAtGxaRA'
-api_key = 'AIzaSyD7LTx-ECbBMewfjX6dzgnxDL7HxLTRZvY'
-music_download_location = 'C:\Music'
+@click.command()
+@click.argument('youtube_link')
+def main(youtube_link):
+    """
+Simple CLI for querying books on Google Books by Oyetoke Toby
 
+Arguments:
 
-if __name__ == '__main__':
+    YOUTUBE_LINK : Link to youtube song, playlist, or channel to download. 
+    """
 
-	playlists = get_playlists(channel_id, api_key)
+    parsed_youtube_link = parse_youtube_link(youtube_link)
 
-	for playlist_name, playlist_id in playlists:
+    if parsed_youtube_link is None:
+        print 'Passed argument is not a url to a song, playlist, or channel. Try again with a valid link.'
+        return
 
-		playlist_name = clean_song_youtube_name(playlist_name)
+    link_type, link_id = parsed_youtube_link
 
-		print playlist_name, playlist_id
+    if link_type == 'song':
+        download_song(link_id, youtube_api_key, download_location='/home/nenad/music')
+    elif link_type == 'playlist':
+        print 'Cant handle playlists yet'
+    elif link_type == 'channel':
+        download_channel(link_id, youtube_api_key, download_location='/home/nenad/music')
+    else:
+        print 'error'
+        return
 
-		playlist_folder_path = os.path.join(music_download_location, playlist_name)
-
-		playlist_songs = get_playlist_items(playlist_id, api_key)
-
-		for song_name, song_id in playlist_songs:
-			# Filters to ensure youtube title does not contain bad characters
-			song_name = clean_song_youtube_name(song_name)
-
-			song_path = os.path.join(playlist_folder_path, song_name) + '.%(ext)s'
-			song_file_path = os.path.join(playlist_folder_path, song_name) + '.mp3'
-
-			print song_name, song_file_path
-
-			song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(song_id)
-
-			execution_arguments = ['youtube-dl', song_youtube_url, '-x', '--audio-format', 'mp3', 
-								   '-o', song_path]
-			
-			return_status = subprocess.call(execution_arguments)
-
-
-			if return_status != 0:
-				logging.error('Downloading of song failed.')
-				continue
-			
-			# Try to tag the song
-			song_author, song_title = parse_youtube_title(song_name)
-			tag_song(song_file_path, song_author, song_title)
-		
+if __name__ == "__main__":
+    main()

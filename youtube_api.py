@@ -107,6 +107,23 @@ def get_channel_name(channel_id, api_key):
 		logging.info('GET request failed for fetching channel name. Status code: {}, response: {}'.format(r.status_code, r.text))
 		return None
 
+def get_song_name(song_id, api_key):
+
+	get_request = 'https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}'.format(song_id, api_key)
+
+	r = requests.get(get_request)
+
+	if r.status_code == 200:
+		logging.info('GET request succeeded for song name.')
+
+		json_response = r.json()
+		# pretty_print_json(json_response)
+
+		return json_response['items'][0]['snippet']['title']		
+	else:
+		logging.info('GET request failed for fetching song name. Status code: {}, response: {}'.format(r.status_code, r.text))
+		return None
+
 
 def parse_youtube_link(youtube_url):
 	"""

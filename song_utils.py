@@ -1,4 +1,5 @@
 import eyed3
+import logging
 import re
 from unidecode import unidecode
 
@@ -36,6 +37,18 @@ def clean_song_youtube_name(song_name):
 
 	return song_name
 
+def clean_for_file_path(youtube_name):
+
+	# Remove illegal characters
+	illegal_chars = '<>:"/\\|?*'
+
+	for char in illegal_chars:
+		youtube_name = youtube_name.replace(char, '')
+
+	# Sub unicode characters to ascii types characters
+	youtube_name = unicode(unidecode(youtube_name), encoding = "utf-8")
+
+	return youtube_name
 
 def parse_youtube_title(full_title):
 	'''
@@ -63,9 +76,14 @@ def tag_song(song_file_path, song_artist, song_title):
 
 	audiofile = eyed3.load(song_file_path)
 
-	if song_artist is not None:
-		audiofile.tag.artist = song_artist
-	if song_title is not None:
-		audiofile.tag.title = song_title
+	print song_file_path, song_artist, song_title
 
-	audiofile.tag.save(song_file_path)
+	if audiofile is not None:
+		if song_artist is not None:
+			audiofile.tag.artist = song_artist
+		if song_title is not None:
+			audiofile.tag.title = song_title
+
+		audiofile.tag.save(song_file_path)
+	else:
+		logging.warning("Tagging failed for file {}.".format(song_file_path))
