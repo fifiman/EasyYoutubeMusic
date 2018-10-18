@@ -20,19 +20,22 @@ def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C
 		
 		print playlist_name, playlist_id
 
-		download_playlist(playlist_id, playlist_name, api_key, channel_file_path)
+		download_playlist(playlist_id, playlist_name, api_key, mp3_tagging, channel_file_path)
 
 
 def download_playlist(playlist_id, playlist_name, api_key, mp3_tagging=True, download_location='C:\\Music'):
 
-	playlist_download_location = os.path.join(download_location, playlist_name)
-	print playlist_name, playlist_download_location
+	playlist_download_location = download_location
+
+	if playlist_name is not None:
+		playlist_name = clean_for_file_path(playlist_name)
+		playlist_download_location = os.path.join(download_location, playlist_name)
 
 	playlist_items = get_playlist_items(playlist_id, api_key)
 
 	for song_name, song_id in playlist_items:
 
-		download_song(song_id, api_key, download_location=playlist_download_location)
+		download_song(song_id, api_key, mp3_tagging, download_location=playlist_download_location)
 
 def download_song(song_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
 

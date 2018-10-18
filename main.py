@@ -1,6 +1,6 @@
 import click
 import os
-from downloader import download_channel, download_song
+from downloader import download_channel, download_playlist, download_song
 from youtube_api import parse_youtube_link
 
 __author__ = "Nenad Bauk"
@@ -12,7 +12,7 @@ my_channel_id = 'UCxEFrjBmbt2CLCFaAtGxaRA'
 @click.command()
 @click.argument('youtube_link')
 @click.option('--enable-tagging/--disable-tagging', default=True, help='Enable/Disable mp3 tagging.')
-@click.option('--output-path', type=click.Path(exists=True, writable=True), help='Path to where music will be downloaded.')
+@click.option('--output-path', type=click.Path(writable=True), help='Path to where music will be downloaded.')
 @click.option('--api-key', help='Api key for Youtube API.')
 def main(youtube_link, enable_tagging, output_path, api_key):
     """
@@ -40,7 +40,8 @@ Arguments:
     if link_type == 'song':
         download_song(link_id, api_key, enable_tagging, download_location=output_path)
     elif link_type == 'playlist':
-        print 'Cant handle playlists yet'
+    	# No playlist name specified
+        download_playlist(link_id, None, api_key, enable_tagging, download_location=output_path)
     elif link_type == 'channel':
         download_channel(link_id, api_key, enable_tagging, download_location=output_path)
     else:
