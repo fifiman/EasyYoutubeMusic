@@ -5,7 +5,7 @@ from youtube_api import get_channel_name, get_song_name
 from youtube_api import get_playlists, get_playlist_items
 from song_utils import clean_for_file_path, clean_song_youtube_name, parse_youtube_title, tag_song
 
-def download_channel(channel_id, api_key, download_location='C:\\Music'):
+def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
 
     # Get name of channel for file path, and clean up name.
 	channel_name = get_channel_name(channel_id, api_key)
@@ -23,7 +23,7 @@ def download_channel(channel_id, api_key, download_location='C:\\Music'):
 		download_playlist(playlist_id, playlist_name, api_key, channel_file_path)
 
 
-def download_playlist(playlist_id, playlist_name, api_key, download_location='C:\\Music'):
+def download_playlist(playlist_id, playlist_name, api_key, mp3_tagging=True, download_location='C:\\Music'):
 
 	playlist_download_location = os.path.join(download_location, playlist_name)
 	print playlist_name, playlist_download_location
@@ -34,7 +34,7 @@ def download_playlist(playlist_id, playlist_name, api_key, download_location='C:
 
 		download_song(song_id, api_key, download_location=playlist_download_location)
 
-def download_song(song_id, api_key, download_location='C:\\Music'):
+def download_song(song_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
 
 	song_name = get_song_name(song_id, api_key)
 	song_name = clean_song_youtube_name(song_name)
@@ -56,4 +56,8 @@ def download_song(song_id, api_key, download_location='C:\\Music'):
 	
 	# Try to tag the song
 	song_author, song_title = parse_youtube_title(song_name)
-	tag_song(song_file_path, song_author, song_title)
+
+	if mp3_tagging:
+		tag_song(song_file_path, song_author, song_title)
+	else:
+		logging.info('Not tagging mp3s, set by user.')
