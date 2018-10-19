@@ -6,6 +6,15 @@ from youtube_api import get_playlists, get_playlist_items
 from song_utils import clean_for_file_path, clean_song_youtube_name, parse_youtube_title, tag_song
 
 def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
+	"""
+	Download all playlists of a given channel.
+
+	Channel name is fetched to be appended to the download location file path,
+	and all of the channel's playlists will be downloaded to this new path.
+
+	Returns:
+		None
+	"""
 
     # Get name of channel for file path, and clean up name.
 	channel_name = get_channel_name(channel_id, api_key)
@@ -24,7 +33,16 @@ def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C
 
 
 def download_playlist(playlist_id, playlist_name, api_key, mp3_tagging=True, download_location='C:\\Music'):
+	"""
+	Download all videos of a given playlist.
+	
+	Playlist name cannot be fetched through the Youtube API. Therefore, if a
+	playlist name is given it will be appended to the download location file
+	path. Otherwise it will remain unchanged.
 
+	Returns:
+		None
+	"""
 	playlist_download_location = download_location
 
 	if playlist_name is not None:
@@ -37,15 +55,22 @@ def download_playlist(playlist_id, playlist_name, api_key, mp3_tagging=True, dow
 
 		download_song(song_id, api_key, mp3_tagging, download_location=playlist_download_location)
 
-def download_song(song_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
+def download_song(video_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
+	"""
+	Download given video and convert to mp3 format in the given location.
 
-	song_name = get_song_name(song_id, api_key)
+	Optionally, the downloaded mp3 can be given ID3 tags based on the video's title. 	
+
+	Returns:
+		None
+	"""
+	song_name = get_song_name(video_id, api_key)
 	song_name = clean_song_youtube_name(song_name)
 
 	yt_dl_output_path = os.path.join(download_location, song_name) + '.%(ext)s'
 	song_file_path = os.path.join(download_location, song_name) + '.mp3'
 
-	song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(song_id)
+	song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(video_id)
 
 	execution_arguments = ['youtube-dl', song_youtube_url, '-x', '--audio-format', 'mp3', 
 							   '-o', yt_dl_output_path]
@@ -54,7 +79,7 @@ def download_song(song_id, api_key, mp3_tagging=True, download_location='C:\\Mus
 
 
 	if return_status != 0:
-		logging.error('Downloading of song failed.')
+		logging.error('Downloading of video failed. Video id: {}.'.format(video_id))
 		return
 	
 	# Try to tag the song

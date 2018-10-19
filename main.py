@@ -5,9 +5,6 @@ from youtube_api import parse_youtube_link
 
 __author__ = "Nenad Bauk"
 
-youtube_api_key = 'AIzaSyD7LTx-ECbBMewfjX6dzgnxDL7HxLTRZvY'
-my_channel_id = 'UCxEFrjBmbt2CLCFaAtGxaRA'
-
 
 @click.command()
 @click.argument('youtube_link')
@@ -22,12 +19,13 @@ Arguments:
 
     YOUTUBE_LINK : Link to youtube song, playlist, or channel to download. 
     """
-
+    
     if output_path is None:
     	output_path = os.getcwd()
 
     if api_key is None:
-    	api_key = youtube_api_key
+    	print 'Please specify youtube api key.'
+    	return
 
     parsed_youtube_link = parse_youtube_link(youtube_link)
 
@@ -40,12 +38,11 @@ Arguments:
     if link_type == 'song':
         download_song(link_id, api_key, enable_tagging, download_location=output_path)
     elif link_type == 'playlist':
-    	# No playlist name specified
         download_playlist(link_id, None, api_key, enable_tagging, download_location=output_path)
     elif link_type == 'channel':
         download_channel(link_id, api_key, enable_tagging, download_location=output_path)
     else:
-        print 'error'
+        print 'Youtube link is invalid. Please pass in the link to a video, playlist, or channel.'
         return
 
 if __name__ == "__main__":
