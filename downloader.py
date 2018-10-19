@@ -48,7 +48,7 @@ def download_song(song_id, api_key, mp3_tagging=True, download_location='C:\\Mus
 	song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(song_id)
 
 	execution_arguments = ['youtube-dl', song_youtube_url, '-x', '--audio-format', 'mp3', 
-							   '-o', song_file_path]
+							   '-o', yt_dl_output_path]
 
 	return_status = subprocess.call(execution_arguments)
 
