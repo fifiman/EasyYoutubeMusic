@@ -27,11 +27,14 @@ Arguments:
     	print('Please specify youtube api key.')
     	return
 
+    download_link(youtube_link, api_key, output_path, enable_tagging=enable_tagging)
+
+def download_link(youtube_link, api_key, output_path, enable_tagging=True):
     parsed_youtube_link = parse_youtube_link(youtube_link)
 
-    if parsed_youtube_link is None:
+    if parse_youtube_link is None:
         print('Passed argument is not a url to a song, playlist, or channel. Try again with a valid link.')
-        return
+        return 1
 
     link_type, link_id = parsed_youtube_link
 
@@ -43,7 +46,9 @@ Arguments:
         download_channel(link_id, api_key, enable_tagging, download_location=output_path)
     else:
         print('Youtube link is invalid. Please pass in the link to a video, playlist, or channel.')
-        return
+        return 2
+
+    return 0
 
 if __name__ == "__main__":
     main()
