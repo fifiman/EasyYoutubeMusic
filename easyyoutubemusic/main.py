@@ -24,13 +24,13 @@ Arguments:
     	output_path = os.getcwd()
 
     if api_key is None:
-    	print 'Please specify youtube api key.'
+    	print('Please specify youtube api key.')
     	return
 
     parsed_youtube_link = parse_youtube_link(youtube_link)
 
     if parsed_youtube_link is None:
-        print 'Passed argument is not a url to a song, playlist, or channel. Try again with a valid link.'
+        print('Passed argument is not a url to a song, playlist, or channel. Try again with a valid link.')
         return
 
     link_type, link_id = parsed_youtube_link
@@ -42,7 +42,7 @@ Arguments:
     elif link_type == 'channel':
         download_channel(link_id, api_key, enable_tagging, download_location=output_path)
     else:
-        print 'Youtube link is invalid. Please pass in the link to a video, playlist, or channel.'
+        print('Youtube link is invalid. Please pass in the link to a video, playlist, or channel.')
         return
 
 if __name__ == "__main__":

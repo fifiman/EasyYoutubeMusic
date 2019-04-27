@@ -27,7 +27,7 @@ def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C
 
 		playlist_name = clean_for_file_path(playlist_name)
 		
-		print playlist_name, playlist_id
+		print(playlist_name, playlist_id)
 
 		download_playlist(playlist_id, playlist_name, api_key, mp3_tagging, channel_file_path)
 

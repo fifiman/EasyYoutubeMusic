@@ -23,7 +23,7 @@ def clean_song_youtube_name(song_name):
 		song_name = song_name.replace(char, '')
 
 	# 2. Sub unicode characters to ascii types characters.
-	song_name = unicode(unidecode(song_name), encoding = "utf-8")
+	song_name = unidecode(song_name)
 	
 	# 3. Remove anything inside of round or square brackets.
 	song_name = re.sub(r'\([^()]*\)', '', song_name)
