@@ -1,8 +1,10 @@
 import logging
 import re
+
 import requests
 
-from utils import pretty_print_json
+from easyyoutubemusic.utils import pretty_print_json
+
 
 def form_get_request_list_playlist(channel_id, api_key, page_token='', max_results='50'):
 	"""

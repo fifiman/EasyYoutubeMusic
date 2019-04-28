@@ -1,9 +1,13 @@
 import logging
 import os
 import subprocess
-from youtube_api import get_channel_name, get_song_name
-from youtube_api import get_playlists, get_playlist_items
-from song_utils import clean_for_file_path, clean_song_youtube_name, parse_youtube_title, tag_song
+
+from easyyoutubemusic.song_utils import (clean_for_file_path,
+                                         clean_song_youtube_name,
+                                         parse_youtube_title, tag_song)
+from easyyoutubemusic.youtube_api import (get_channel_name, get_playlist_items,
+                                          get_playlists, get_song_name)
+
 
 def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
 	"""

@@ -1,7 +1,14 @@
-import click
 import os
-from downloader import download_channel, download_playlist, download_song
-from youtube_api import parse_youtube_link
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
+
+import click
+
+from easyyoutubemusic.downloader import (download_channel, download_playlist,
+                                         download_song)
+from easyyoutubemusic.youtube_api import parse_youtube_link
+
 
 __author__ = "Nenad Bauk"
 
@@ -23,18 +30,29 @@ Arguments:
     if output_path is None:
     	output_path = os.getcwd()
 
+    download_link(youtube_link, output_path, api_key=None, enable_tagging=enable_tagging)
+
+def load_api_key():
+    key_dir = os.path.split(os.path.realpath(__file__))[0]
+    key_path = os.path.join(key_dir, 'key.txt')
+
+    with open(key_path) as f_key:
+        key = f_key.read().strip()
+        return key
+    
+    return None
+
+def download_link(youtube_link, output_path, api_key=None, enable_tagging=True):
+    # Try loading api key from file.
+    api_key = load_api_key()
+
     if api_key is None:
-    	print('Please specify youtube api key.')
-    	return
+        raise Exception('No api key available.')
 
-    download_link(youtube_link, api_key, output_path, enable_tagging=enable_tagging)
-
-def download_link(youtube_link, api_key, output_path, enable_tagging=True):
     parsed_youtube_link = parse_youtube_link(youtube_link)
 
-    if parse_youtube_link is None:
-        print('Passed argument is not a url to a song, playlist, or channel. Try again with a valid link.')
-        return 1
+    if parsed_youtube_link is None:
+        raise Exception('Passed argument is not a url to a song, playlist, or channel. Try again with a valid link.')
 
     link_type, link_id = parsed_youtube_link
 
@@ -45,10 +63,7 @@ def download_link(youtube_link, api_key, output_path, enable_tagging=True):
     elif link_type == 'channel':
         download_channel(link_id, api_key, enable_tagging, download_location=output_path)
     else:
-        print('Youtube link is invalid. Please pass in the link to a video, playlist, or channel.')
-        return 2
-
-    return 0
+        raise Exception('Youtube link is invalid. Please pass in the link to a video, playlist, or channel.')
 
 if __name__ == "__main__":
     main()
