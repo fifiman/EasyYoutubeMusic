@@ -16,7 +16,13 @@ Supported YouTube link types:
 Use `python main.py --help` for help on all available features.
 
 # Installation
+Install the following packages:
 
+`pip install youtube-dl`
+
+`pip install eyeD3`
+
+For audio conversion you will need to install ffmpeg. It is best to install chocolatey and run `choco install ffmpeg`.
 
 # MP3 Tagging
 The current logic for tagging mp3s assumes that the YouTube title for songs is in format `Artist - Song Title`. If there are no dashes, artist will be left empty and the entire YouTube title will be the song title. 

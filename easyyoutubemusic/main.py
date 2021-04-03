@@ -16,9 +16,10 @@ __author__ = "Nenad Bauk"
 @click.command()
 @click.argument('youtube_link')
 @click.option('--enable-tagging/--disable-tagging', default=True, help='Enable/Disable mp3 tagging.')
+@click.option('--overwrite', is_flag=True, help="Download song even if it already exists.")
 @click.option('--output-path', type=click.Path(writable=True), help='Path to where music will be downloaded.')
 @click.option('--api-key', help='Api key for Youtube API.')
-def main(youtube_link, enable_tagging, output_path, api_key):
+def main(youtube_link, enable_tagging, overwrite, output_path, api_key):
     """
 Simple CLI for querying books on Google Books by Oyetoke Toby
 
@@ -30,7 +31,7 @@ Arguments:
     if output_path is None:
     	output_path = os.getcwd()
 
-    download_link(youtube_link, output_path, api_key=None, enable_tagging=enable_tagging)
+    download_link(youtube_link, output_path, api_key=None, overwrite=overwrite, enable_tagging=enable_tagging)
 
 def load_api_key():
     key_dir = os.path.split(os.path.realpath(__file__))[0]
@@ -42,7 +43,7 @@ def load_api_key():
     
     return None
 
-def download_link(youtube_link, output_path, api_key=None, enable_tagging=True):
+def download_link(youtube_link, output_path, api_key=None, overwrite=False, enable_tagging=True):
     # Try loading api key from file.
     api_key = load_api_key()
 
@@ -57,11 +58,11 @@ def download_link(youtube_link, output_path, api_key=None, enable_tagging=True):
     link_type, link_id = parsed_youtube_link
 
     if link_type == 'song':
-        download_song(link_id, api_key, enable_tagging, download_location=output_path)
+        download_song(link_id, api_key, overwrite, enable_tagging, download_location=output_path)
     elif link_type == 'playlist':
-        download_playlist(link_id, None, api_key, enable_tagging, download_location=output_path)
+        download_playlist(link_id, None, api_key, overwrite, enable_tagging, download_location=output_path)
     elif link_type == 'channel':
-        download_channel(link_id, api_key, enable_tagging, download_location=output_path)
+        download_channel(link_id, api_key, overwrite, enable_tagging, download_location=output_path)
     else:
         raise Exception('Youtube link is invalid. Please pass in the link to a video, playlist, or channel.')
 

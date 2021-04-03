@@ -3,8 +3,7 @@ import re
 
 import requests
 
-from easyyoutubemusic.utils import pretty_print_json
-
+# TODO: Add throttling for youtube API requests.
 
 def form_get_request_list_playlist(channel_id, api_key, page_token='', max_results='50'):
 	"""

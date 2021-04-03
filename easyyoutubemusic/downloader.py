@@ -9,7 +9,7 @@ from easyyoutubemusic.youtube_api import (get_channel_name, get_playlist_items,
                                           get_playlists, get_song_name)
 
 
-def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
+def download_channel(channel_id, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
 	"""
 	Download all playlists of a given channel.
 
@@ -33,10 +33,10 @@ def download_channel(channel_id, api_key, mp3_tagging=True, download_location='C
 		
 		print(playlist_name, playlist_id)
 
-		download_playlist(playlist_id, playlist_name, api_key, mp3_tagging, channel_file_path)
+		download_playlist(playlist_id, playlist_name, api_key, overwrite, mp3_tagging, channel_file_path)
 
 
-def download_playlist(playlist_id, playlist_name, api_key, mp3_tagging=True, download_location='C:\\Music'):
+def download_playlist(playlist_id, playlist_name, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
 	"""
 	Download all videos of a given playlist.
 	
@@ -57,9 +57,9 @@ def download_playlist(playlist_id, playlist_name, api_key, mp3_tagging=True, dow
 
 	for song_name, song_id in playlist_items:
 
-		download_song(song_id, api_key, mp3_tagging, download_location=playlist_download_location)
+		download_song(song_id, api_key, overwrite, mp3_tagging, download_location=playlist_download_location)
 
-def download_song(video_id, api_key, mp3_tagging=True, download_location='C:\\Music'):
+def download_song(video_id, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
 	"""
 	Download given video and convert to mp3 format in the given location.
 
@@ -74,22 +74,16 @@ def download_song(video_id, api_key, mp3_tagging=True, download_location='C:\\Mu
 	yt_dl_output_path = os.path.join(download_location, song_name) + '.%(ext)s'
 	song_file_path = os.path.join(download_location, song_name) + '.mp3'
 
-	song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(video_id)
+	if overwrite or not os.path.isfile(song_file_path):
+		song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(video_id)
+		execution_arguments = ['youtube-dl', song_youtube_url, '-x', '--audio-format', 'mp3', '-o', yt_dl_output_path]
+		return_status = subprocess.call(execution_arguments)
 
-	execution_arguments = ['youtube-dl', song_youtube_url, '-x', '--audio-format', 'mp3', 
-							   '-o', yt_dl_output_path]
-
-	return_status = subprocess.call(execution_arguments)
-
-
-	if return_status != 0:
-		logging.error('Downloading of video failed. Video id: {}.'.format(video_id))
-		return
+		if return_status != 0:
+			logging.error('Downloading of video failed. Video id: {}.'.format(video_id))
+			return
 	
-	# Try to tag the song
-	song_author, song_title = parse_youtube_title(song_name)
-
 	if mp3_tagging:
+		song_author, song_title = parse_youtube_title(song_name)
+		logging.info("Tagging song {} with author {} and title {}.".format(song_name, song_author, song_title))
 		tag_song(song_file_path, song_author, song_title)
-	else:
-		logging.info('Not tagging mp3s, set by user.')
