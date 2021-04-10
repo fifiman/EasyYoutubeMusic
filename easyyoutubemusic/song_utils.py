@@ -60,7 +60,7 @@ def clean_for_file_path(youtube_name):
 		youtube_name = youtube_name.replace(char, '')
 
 	# 2. Sub unicode characters to ascii types characters
-	youtube_name = unicode(unidecode(youtube_name), encoding = "utf-8")
+	youtube_name = unidecode(youtube_name)
 
 	return youtube_name
 
