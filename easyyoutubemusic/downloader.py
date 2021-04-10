@@ -6,7 +6,7 @@ from easyyoutubemusic.song_utils import (clean_for_file_path,
                                          clean_song_youtube_name,
                                          parse_youtube_title, tag_song)
 from easyyoutubemusic.youtube_api import (get_channel_name, get_playlist_items,
-                                          get_playlists, get_song_name)
+										  get_playlists_of_channel, get_song_name)
 
 
 def download_channel(channel_id, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
@@ -25,7 +25,7 @@ def download_channel(channel_id, api_key, overwrite, mp3_tagging=True, download_
 	channel_name = clean_for_file_path(channel_name)
 	channel_file_path = os.path.join(download_location, channel_name)
 
-	playlists = get_playlists(channel_id, api_key)
+	playlists = get_playlists_of_channel(channel_id, api_key)
 
 	for playlist_name, playlist_id in playlists:
 
@@ -77,6 +77,7 @@ def download_song(video_id, api_key, overwrite, mp3_tagging=True, download_locat
 	if overwrite or not os.path.isfile(song_file_path):
 		song_youtube_url = 'https://www.youtube.com/watch?v={}'.format(video_id)
 		execution_arguments = ['youtube-dl', song_youtube_url, '-x', '--audio-format', 'mp3', '-o', yt_dl_output_path]
+		# TODO: Turn off the output of this subprocess if we do not care about verbosity. It does look cool tho.
 		return_status = subprocess.call(execution_arguments)
 
 		if return_status != 0:
