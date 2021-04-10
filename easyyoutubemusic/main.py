@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
 import click
+import logging
 
 from easyyoutubemusic.downloader import (download_channel, download_playlist,
                                          download_song)
@@ -12,14 +13,14 @@ from easyyoutubemusic.youtube_api import parse_youtube_link
 
 __author__ = "Nenad Bauk"
 
-
 @click.command()
 @click.argument('youtube_link')
 @click.option('--enable-tagging/--disable-tagging', default=True, help='Enable/Disable mp3 tagging.')
 @click.option('--overwrite', is_flag=True, help="Download song even if it already exists.")
 @click.option('--output-path', type=click.Path(writable=True), help='Path to where music will be downloaded.')
 @click.option('--api-key', help='Api key for Youtube API.')
-def main(youtube_link, enable_tagging, overwrite, output_path, api_key):
+@click.option('--log-level', type=click.Choice(["Info", "Debug", "Error"], case_sensitive=False), default="Error")
+def main(youtube_link, enable_tagging, overwrite, output_path, api_key, log_level):
     """
 Simple CLI for querying books on Google Books by Oyetoke Toby
 
@@ -30,6 +31,15 @@ Arguments:
     
     if output_path is None:
     	output_path = os.getcwd()
+
+    if log_level == "Info":
+        logging.basicConfig(level=logging.INFO)
+    elif log_level == "Debug":
+        logging.basicConfig(level=logging.DEBUG)
+    elif log_level == "Error":
+        logging.basicConfig(level=logging.ERROR)
+    else:
+        raise ValueError("This log level has not been implemented. Log level: {}".format(log_level))
 
     download_link(youtube_link, output_path, api_key=None, overwrite=overwrite, enable_tagging=enable_tagging)
 

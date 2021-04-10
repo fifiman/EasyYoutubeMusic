@@ -42,9 +42,7 @@ def get_playlists(channel_id, api_key):
 	results = []
 
 	while has_next_page_token:
-
 		get_request = form_get_request_list_playlist(channel_id, api_key, page_token=next_page_token)
-
 		r = requests.get(get_request)
 
 		if r.status_code == 200:
@@ -62,7 +60,7 @@ def get_playlists(channel_id, api_key):
 			else:
 				has_next_page_token = False
 		else:
-			logging.info('GET request failed for fetching playlists. Status code: {}, response: {}'.format(r.status_code, r.text))
+			logging.error('GET request failed for fetching playlists. Status code: {}, response: {}'.format(r.status_code, r.text))
 			break
 
 	return results
@@ -104,7 +102,7 @@ def get_playlist_items(playlist_id, api_key):
 			
 			break
 		else:
-			logging.info('GET request failed for fetching playlist items. Status code: {}, response: {}'.format(r.status_code, r.text))
+			logging.error('GET request failed for fetching playlist items. Status code: {}, response: {}'.format(r.status_code, r.text))
 			break
 
 	return results
@@ -114,6 +112,7 @@ def get_channel_name(channel_id, api_key):
 	"""
 	Fetch channel name through it's channel id.
 	"""
+	print(channel_id)
 	get_request = 'https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}'.format(channel_id, api_key)
 
 	r = requests.get(get_request)
@@ -122,9 +121,10 @@ def get_channel_name(channel_id, api_key):
 		logging.info('GET request succeeded for fetching channel name.')
 
 		json_response = r.json()
+		print (json_response)
 		return json_response['items'][0]['snippet']['title']		
 	else:
-		logging.info('GET request failed for fetching channel name. Status code: {}, response: {}'.format(r.status_code, r.text))
+		logging.error('GET request failed for fetching channel name. Status code: {}, response: {}'.format(r.status_code, r.text))
 		return None
 
 def get_song_name(video_id, api_key):
@@ -139,9 +139,11 @@ def get_song_name(video_id, api_key):
 		logging.info('GET request succeeded for song name.')
 
 		json_response = r.json()
+
+		print(json_response)
 		return json_response['items'][0]['snippet']['title']		
 	else:
-		logging.info('GET request failed for fetching song name. Status code: {}, response: {}'.format(r.status_code, r.text))
+		logging.error('GET request failed for fetching song name. Status code: {}, response: {}'.format(r.status_code, r.text))
 		return None
 
 
