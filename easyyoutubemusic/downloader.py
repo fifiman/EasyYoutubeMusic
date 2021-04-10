@@ -8,6 +8,8 @@ from easyyoutubemusic.song_utils import (clean_for_file_path,
 from easyyoutubemusic.youtube_api import (get_channel_name, get_playlist_items,
 										  get_playlists_of_channel, get_song_name)
 
+# TODO: Add better control mechanisms between these functions so that we can better count how much of a
+#  playlist/channel we have successfully downloaded.
 
 def download_channel(channel_id, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
 	"""
@@ -22,20 +24,22 @@ def download_channel(channel_id, api_key, overwrite, mp3_tagging=True, download_
 
     # Get name of channel for file path, and clean up name.
 	channel_name = get_channel_name(channel_id, api_key)
+
+	if channel_name is None:
+		print("A channel with this id does not exist. Channel id: {}".format(channel_id))
+		return
+
 	channel_name = clean_for_file_path(channel_name)
 	channel_file_path = os.path.join(download_location, channel_name)
 
 	playlists = get_playlists_of_channel(channel_id, api_key)
 
 	for playlist_name, playlist_id in playlists:
-
 		playlist_name = clean_for_file_path(playlist_name)
-		
-		print(playlist_name, playlist_id)
-
 		download_playlist(playlist_id, playlist_name, api_key, overwrite, mp3_tagging, channel_file_path)
 
 
+# TODO: Can we still not fetch a playlist name through the youtube API?
 def download_playlist(playlist_id, playlist_name, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
 	"""
 	Download all videos of a given playlist.
@@ -56,7 +60,6 @@ def download_playlist(playlist_id, playlist_name, api_key, overwrite, mp3_taggin
 	playlist_items = get_playlist_items(playlist_id, api_key)
 
 	for song_name, song_id in playlist_items:
-
 		download_song(song_id, api_key, overwrite, mp3_tagging, download_location=playlist_download_location)
 
 def download_song(video_id, api_key, overwrite, mp3_tagging=True, download_location='C:\\Music'):
@@ -69,6 +72,10 @@ def download_song(video_id, api_key, overwrite, mp3_tagging=True, download_locat
 		None
 	"""
 	song_name = get_song_name(video_id, api_key)
+	if song_name is None:
+		print("A video with this id does not exist. Video id: {}".format(video_id))
+		return
+
 	song_name = clean_song_youtube_name(song_name)
 
 	yt_dl_output_path = os.path.join(download_location, song_name) + '.%(ext)s'

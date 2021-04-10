@@ -145,8 +145,11 @@ def get_channel_name(channel_id, api_key):
 
         json_response = r.json()
         try:
-            # TODO: Handle channel does not exist.
-            return json_response['items'][0]['snippet']['title']
+            # The channel does not exist if we get empty `items` in the response.
+            if json_response['items']:
+                return json_response['items'][0]['snippet']['title']
+            else:
+                return None
         except (IndexError, KeyError) as e:
             raise YoutubeApiException(
                 {"message": "Failed to extract value from channel name response", "response": json_response}) from e
@@ -168,10 +171,12 @@ def get_song_name(video_id, api_key):
         logging.info('GET request succeeded for song name.')
 
         json_response = r.json()
-
         try:
-            # TODO: Handle song does not exist.
-            return json_response['items'][0]['snippet']['title']
+            # The song does not exist if we get empty `items` in the response.
+            if json_response['items']:
+                return json_response['items'][0]['snippet']['title']
+            else:
+                return None
         except (IndexError, KeyError) as e:
             raise YoutubeApiException(
                 {"message": "Failed to extract value from song name response", "response": json_response}) from e
