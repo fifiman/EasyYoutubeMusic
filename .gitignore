@@ -2,3 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# IntelliJ files
+.DS_Store
+.idea
